@@ -1,0 +1,1609 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6efe2" />
+  <title>啃月饼</title>
+
+  <style>
+    :root {
+      --bg: #f6efe2;
+      --panel: #fffaf2;
+      --card: #fffdf8;
+      --text: #36271d;
+      --muted: #7f6a5b;
+      --border: #decdbd;
+      --accent: #b55f2a;
+      --accent-soft: #f1d8c7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.9), transparent 28rem),
+        linear-gradient(180deg, #f7f0e6 0%, #f3eadc 100%);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Text",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        sans-serif;
+    }
+
+    body {
+      padding:
+        max(18px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #app {
+      width: min(760px, 100%);
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: rgba(255, 250, 242, 0.93);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: 0 12px 40px rgba(87, 55, 29, 0.08);
+      backdrop-filter: blur(8px);
+    }
+
+    .title {
+      font-size: clamp(24px, 6vw, 34px);
+      font-weight: 850;
+      margin: 0 0 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    p {
+      line-height: 1.65;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: .9em;
+      overflow-wrap: anywhere;
+    }
+
+    .example {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      line-height: 1.5;
+    }
+
+    .fields {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 11px 13px;
+      background: #fff;
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+    }
+
+    input {
+      min-height: 46px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(181, 95, 42, 0.12);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 17px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 9px 16px;
+      background: var(--card);
+      color: var(--text);
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(181, 95, 42, .27);
+      outline-offset: 2px;
+    }
+
+    .validation {
+      min-height: 1.4em;
+      margin-top: 10px;
+      color: #9a3f2b;
+      font-size: .92em;
+    }
+
+    .tiny {
+      font-size: .84em;
+      color: var(--muted);
+    }
+
+    .stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 520px;
+      padding: 24px 12px 20px;
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,.92), transparent 21rem),
+        rgba(255, 250, 242, 0.93);
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(87, 55, 29, 0.08);
+    }
+
+    .toolbar {
+      position: absolute;
+      z-index: 30;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toolbar > * {
+      pointer-events: auto;
+    }
+
+    .remaining {
+      font-size: .82em;
+      color: var(--muted);
+      background: rgba(255,253,248,.92);
+      border: 1px solid var(--border);
+      padding: 7px 11px;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+    }
+
+    .toggles {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mini {
+      min-height: 36px !important;
+      padding: 6px 10px !important;
+      font-size: .82em;
+      background: rgba(255,253,248,.92);
+      backdrop-filter: blur(8px);
+    }
+
+    .cake-area {
+      width: min(94vw, 440px);
+      display: grid;
+      justify-items: center;
+      padding-top: 32px;
+    }
+
+    .svg-wrap {
+      width: min(88vw, 400px);
+      max-width: 400px;
+      aspect-ratio: 1;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: crosshair;
+      transform-origin: center;
+    }
+
+    .svg-wrap.chomp {
+      animation: moonNibble .19s ease-out;
+    }
+
+    @keyframes moonNibble {
+      0%, 100% { transform: scale(1); }
+      35% { transform: scale(.976) rotate(-.5deg); }
+      65% { transform: scale(1.012) rotate(.35deg); }
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+      filter: drop-shadow(0 15px 16px rgba(76, 43, 21, .16));
+    }
+
+    .hint {
+      text-align: center;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: .94em;
+    }
+
+    .subhint {
+      text-align: center;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .8em;
+      min-height: 20px;
+    }
+
+    .particle-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .crumb {
+      position: absolute;
+      border-radius: 50% 45% 55% 35%;
+      will-change: transform, opacity;
+      animation: crumbDrop var(--dur) cubic-bezier(.18,.7,.28,1) forwards;
+    }
+
+    @keyframes crumbDrop {
+      0% {
+        transform: translate(-50%, -50%) rotate(0) scale(.45);
+        opacity: 0;
+      }
+      12% {
+        opacity: 1;
+      }
+      100% {
+        transform:
+          translate(
+            calc(-50% + var(--dx)),
+            calc(-50% + var(--dy))
+          )
+          rotate(var(--rot))
+          scale(.92);
+        opacity: 0;
+      }
+    }
+
+    .wish {
+      display: none;
+      text-align: center;
+      max-width: 540px;
+      padding: 36px 20px;
+    }
+
+    .wish.show {
+      display: block;
+      animation: wishIn .5s ease-out;
+    }
+
+    @keyframes wishIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(.98);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .moon {
+      font-size: 68px;
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+
+    .wish-text {
+      white-space: pre-wrap;
+      font-size: clamp(24px, 6vw, 36px);
+      font-weight: 850;
+      line-height: 1.42;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .panel {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .stage {
+        min-height: 500px;
+        border-radius: 22px;
+      }
+
+      .toolbar {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+      }
+
+      .mini {
+        font-size: .78em;
+        padding: 6px 9px !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .svg-wrap.chomp,
+      .crumb,
+      .wish.show {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="app">
+    <section id="tutorial" class="panel">
+      <h1 class="title">啃月饼链接 🥮</h1>
+
+      <p class="muted">
+        这个页面需要两个 URL 参数：
+        <code>cake</code> 是印在月饼上的字，
+        <code>wish</code> 是吃完后的祝福。
+        月饼文字里用 <code>[br]</code> 手动换行。
+      </p>
+
+      <div class="example">
+        <code>?cake=中秋[br]快乐&amp;wish=祝你每天都开心🥮</code>
+      </div>
+
+      <div class="fields">
+        <label>
+          月饼上的字
+          <input
+            id="cakeInput"
+            value="中秋[br]快乐"
+            aria-label="月饼上的字"
+          />
+        </label>
+
+        <label>
+          吃完后的祝福
+          <textarea
+            id="wishInput"
+            aria-label="吃完后的祝福"
+          >中秋快乐！🥮
+愿接下来的日子也甜甜的。</textarea>
+        </label>
+      </div>
+
+      <div
+        id="validation"
+        class="validation"
+        aria-live="polite"
+      ></div>
+
+      <div class="actions">
+        <button
+          id="previewBtn"
+          type="button"
+          class="primary"
+        >
+          试玩这块月饼
+        </button>
+
+        <button
+          id="linkBtn"
+          type="button"
+        >
+          生成当前链接
+        </button>
+      </div>
+
+      <p id="generatedLink" class="tiny"></p>
+
+      <p class="tiny">
+        如果缺少任意参数、参数为空、月饼文字格式不对，
+        或祝福文字明显过长，就会显示这个教程页面。
+      </p>
+    </section>
+
+    <section id="experience" hidden>
+      <div id="stage" class="stage">
+        <div class="toolbar">
+          <div id="remaining" class="remaining">
+            还剩 100%
+          </div>
+
+          <div class="toggles">
+            <button
+              id="soundBtn"
+              type="button"
+              class="mini"
+            >
+              🔊 声音
+            </button>
+
+            <button
+              id="vibeBtn"
+              type="button"
+              class="mini"
+            >
+              📳 震动
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="particleLayer"
+          class="particle-layer"
+          aria-hidden="true"
+        ></div>
+
+        <div id="cakeScene" class="cake-area">
+          <div
+            id="svgWrap"
+            class="svg-wrap"
+            role="button"
+            tabindex="0"
+            aria-label="月饼。点击月饼任意位置咬一口。"
+          >
+            <svg
+              id="cakeSvg"
+              viewBox="0 0 400 400"
+              aria-hidden="true"
+            >
+              <defs>
+                <radialGradient
+                  id="doughGrad"
+                  cx="38%"
+                  cy="31%"
+                  r="72%"
+                >
+                  <stop offset="0" stop-color="#f7d68f" />
+                  <stop offset=".48" stop-color="#dda451" />
+                  <stop offset="1" stop-color="#a96328" />
+                </radialGradient>
+
+                <radialGradient
+                  id="rimGrad"
+                  cx="43%"
+                  cy="34%"
+                  r="70%"
+                >
+                  <stop offset="0" stop-color="#e7b867" />
+                  <stop offset="1" stop-color="#95501e" />
+                </radialGradient>
+
+                <filter
+                  id="emboss"
+                  x="-20%"
+                  y="-20%"
+                  width="140%"
+                  height="140%"
+                >
+                  <feDropShadow
+                    dx="0"
+                    dy="2"
+                    stdDeviation="1.4"
+                    flood-color="#704019"
+                    flood-opacity=".34"
+                  />
+                </filter>
+
+                <mask id="cakeMask">
+                  <rect width="400" height="400" fill="black" />
+                  <circle
+                    cx="200"
+                    cy="200"
+                    r="158"
+                    fill="white"
+                  />
+                  <g id="biteMask" fill="black"></g>
+                </mask>
+
+                <g id="petal">
+                  <ellipse
+                    cx="200"
+                    cy="115"
+                    rx="20"
+                    ry="58"
+                    fill="none"
+                    stroke="#8f5427"
+                    stroke-width="5"
+                  />
+                  <ellipse
+                    cx="200"
+                    cy="126"
+                    rx="8"
+                    ry="34"
+                    fill="none"
+                    stroke="#a56630"
+                    stroke-width="3"
+                  />
+                </g>
+
+                <g id="seed">
+                  <circle
+                    cx="200"
+                    cy="73"
+                    r="5.5"
+                    fill="#9a5b2b"
+                  />
+                  <circle
+                    cx="200"
+                    cy="73"
+                    r="2"
+                    fill="#e5b968"
+                  />
+                </g>
+              </defs>
+
+              <g mask="url(#cakeMask)">
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="162"
+                  fill="url(#rimGrad)"
+                />
+
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="151"
+                  fill="url(#doughGrad)"
+                />
+
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="143"
+                  fill="none"
+                  stroke="#895022"
+                  stroke-width="4"
+                  opacity=".72"
+                />
+
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="132"
+                  fill="none"
+                  stroke="#efc978"
+                  stroke-width="3"
+                  opacity=".65"
+                />
+
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="122"
+                  fill="none"
+                  stroke="#9b5d2c"
+                  stroke-width="2.5"
+                  stroke-dasharray="3 9"
+                  opacity=".72"
+                />
+
+                <g opacity=".72" filter="url(#emboss)">
+                  <use href="#petal" />
+                  <use href="#petal" transform="rotate(30 200 200)" />
+                  <use href="#petal" transform="rotate(60 200 200)" />
+                  <use href="#petal" transform="rotate(90 200 200)" />
+                  <use href="#petal" transform="rotate(120 200 200)" />
+                  <use href="#petal" transform="rotate(150 200 200)" />
+                  <use href="#petal" transform="rotate(180 200 200)" />
+                  <use href="#petal" transform="rotate(210 200 200)" />
+                  <use href="#petal" transform="rotate(240 200 200)" />
+                  <use href="#petal" transform="rotate(270 200 200)" />
+                  <use href="#petal" transform="rotate(300 200 200)" />
+                  <use href="#petal" transform="rotate(330 200 200)" />
+                </g>
+
+                <g opacity=".82">
+                  <use href="#seed" />
+                  <use href="#seed" transform="rotate(30 200 200)" />
+                  <use href="#seed" transform="rotate(60 200 200)" />
+                  <use href="#seed" transform="rotate(90 200 200)" />
+                  <use href="#seed" transform="rotate(120 200 200)" />
+                  <use href="#seed" transform="rotate(150 200 200)" />
+                  <use href="#seed" transform="rotate(180 200 200)" />
+                  <use href="#seed" transform="rotate(210 200 200)" />
+                  <use href="#seed" transform="rotate(240 200 200)" />
+                  <use href="#seed" transform="rotate(270 200 200)" />
+                  <use href="#seed" transform="rotate(300 200 200)" />
+                  <use href="#seed" transform="rotate(330 200 200)" />
+                </g>
+
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="78"
+                  fill="#dca14f"
+                  opacity=".92"
+                />
+
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="72"
+                  fill="none"
+                  stroke="#8e5124"
+                  stroke-width="4"
+                />
+
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="64"
+                  fill="none"
+                  stroke="#efc675"
+                  stroke-width="2"
+                  opacity=".85"
+                />
+
+                <g
+                  id="stampGroup"
+                  filter="url(#emboss)"
+                ></g>
+
+                <ellipse
+                  cx="154"
+                  cy="132"
+                  rx="57"
+                  ry="25"
+                  fill="#fff3c6"
+                  opacity=".10"
+                  transform="rotate(-24 154 132)"
+                />
+              </g>
+            </svg>
+          </div>
+
+          <div class="hint">
+            点哪里，就从哪里啃一口
+          </div>
+
+          <div id="subhint" class="subhint">
+            越往里面点，这一口越大。
+          </div>
+        </div>
+
+        <div
+          id="wishScene"
+          class="wish"
+          aria-live="polite"
+        >
+          <div class="moon">🌕</div>
+
+          <div
+            id="wishText"
+            class="wish-text"
+          ></div>
+
+          <div class="actions" style="justify-content:center">
+            <button
+              id="againBtn"
+              type="button"
+            >
+              再吃一块
+            </button>
+
+            <button
+              id="backBtn"
+              type="button"
+            >
+              返回教程
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const tutorial = document.querySelector("#tutorial");
+      const experience = document.querySelector("#experience");
+      const cakeInput = document.querySelector("#cakeInput");
+      const wishInput = document.querySelector("#wishInput");
+      const validation = document.querySelector("#validation");
+      const previewBtn = document.querySelector("#previewBtn");
+      const linkBtn = document.querySelector("#linkBtn");
+      const generatedLink = document.querySelector("#generatedLink");
+
+      const svg = document.querySelector("#cakeSvg");
+      const svgWrap = document.querySelector("#svgWrap");
+      const biteMask = document.querySelector("#biteMask");
+      const stampGroup = document.querySelector("#stampGroup");
+      const stage = document.querySelector("#stage");
+      const particleLayer = document.querySelector("#particleLayer");
+      const remaining = document.querySelector("#remaining");
+      const subhint = document.querySelector("#subhint");
+
+      const cakeScene = document.querySelector("#cakeScene");
+      const wishScene = document.querySelector("#wishScene");
+      const wishText = document.querySelector("#wishText");
+      const againBtn = document.querySelector("#againBtn");
+      const backBtn = document.querySelector("#backBtn");
+
+      const soundBtn = document.querySelector("#soundBtn");
+      const vibeBtn = document.querySelector("#vibeBtn");
+
+      const NS = "http://www.w3.org/2000/svg";
+
+      const CX = 200;
+      const CY = 200;
+      const R = 158;
+
+      let bites = [];
+      let soundOn = true;
+      let vibeOn = true;
+      let audioCtx = null;
+      let finished = false;
+
+      function parseCake(raw) {
+        return String(raw ?? "")
+          .split("[br]")
+          .map(part => part.trim());
+      }
+
+      function validate(rawCake, rawWish) {
+        const rawCakeString = String(rawCake ?? "");
+        const wish = String(rawWish ?? "").trim();
+        const lines = parseCake(rawCakeString);
+
+        if (!rawCakeString.trim() || !wish) {
+          return {
+            ok: false,
+            msg: "需要同时提供 cake 和 wish 两个参数。"
+          };
+        }
+
+        if (lines.some(line => !line)) {
+          return {
+            ok: false,
+            msg: "cake 的 [br] 两边都要有文字，不能产生空行。"
+          };
+        }
+
+        if (lines.length > 4) {
+          return {
+            ok: false,
+            msg: "月饼上的文字最多 4 行。"
+          };
+        }
+
+        if (lines.join("").length > 28) {
+          return {
+            ok: false,
+            msg: "月饼上的文字太长了，最多 28 个字符。"
+          };
+        }
+
+        if (wish.length > 240) {
+          return {
+            ok: false,
+            msg: "祝福文字太长了，最多 240 个字符。"
+          };
+        }
+
+        return {
+          ok: true,
+          lines,
+          wish
+        };
+      }
+
+      function renderStamp(lines) {
+        stampGroup.replaceChildren();
+
+        const maxLen = Math.max(
+          ...lines.map(line => [...line].length)
+        );
+
+        let size = Math.min(
+          46,
+          Math.max(
+            25,
+            72 / Math.max(1, lines.length),
+            130 / Math.max(2, maxLen)
+          )
+        );
+
+        if (lines.length === 1) {
+          size = Math.min(
+            52,
+            145 / Math.max(2, maxLen)
+          );
+        }
+
+        const gap = size * 1.03;
+        const total = gap * (lines.length - 1);
+        const start = 200 - total / 2 + size * .34;
+
+        lines.forEach((line, i) => {
+          const t = document.createElementNS(NS, "text");
+
+          t.setAttribute("x", "200");
+          t.setAttribute(
+            "y",
+            String(start + i * gap)
+          );
+
+          t.setAttribute("text-anchor", "middle");
+          t.setAttribute("font-size", String(size));
+          t.setAttribute("font-weight", "900");
+          t.setAttribute("fill", "#6e3f20");
+          t.setAttribute("stroke", "#e8bc69");
+          t.setAttribute("stroke-width", "1.6");
+          t.setAttribute("paint-order", "stroke");
+          t.setAttribute(
+            "font-family",
+            "STSong, Songti SC, SimSun, serif"
+          );
+
+          t.textContent = line;
+
+          stampGroup.appendChild(t);
+        });
+      }
+
+      function circleEl(x, y, r) {
+        const c = document.createElementNS(NS, "circle");
+
+        c.setAttribute("cx", x.toFixed(2));
+        c.setAttribute("cy", y.toFixed(2));
+        c.setAttribute("r", r.toFixed(2));
+
+        return c;
+      }
+
+      function addBiteGeometry(px, py) {
+        const dx = px - CX;
+        const dy = py - CY;
+        const d = Math.hypot(dx, dy);
+
+        if (d > R || d < 1) {
+          return null;
+        }
+
+        const ux = dx / d;
+        const uy = dy / d;
+
+        /*
+          点击点 = 咬痕主圆朝月饼内部方向的顶点。
+          圆心 = 与点击方向对应的月饼原始外圆点。
+          所以主圆半径 = 外圆点到点击点的距离 = R - d。
+        */
+        const ox = CX + ux * R;
+        const oy = CY + uy * R;
+        const rad = R - d;
+
+        if (rad < 3) {
+          subhint.textContent =
+            "这一口太小啦——往里面一点点再咬。";
+          return null;
+        }
+
+        const circles = [
+          {
+            x: ox,
+            y: oy,
+            r: rad
+          }
+        ];
+
+        /*
+          在咬痕朝月饼内部的圆弧上叠一串小圆，
+          形成不完全规则的齿印边缘。
+        */
+        const inwardAngle =
+          Math.atan2(CY - oy, CX - ox);
+
+        const toothR =
+          Math.max(3.4, Math.min(10, rad * .12));
+
+        const count =
+          Math.max(
+            5,
+            Math.min(
+              11,
+              Math.round(rad / 8)
+            )
+          );
+
+        for (let i = 0; i < count; i++) {
+          const a =
+            inwardAngle
+            - 1.16
+            + (2.32 * i / Math.max(1, count - 1));
+
+          const orbit = rad * .91;
+
+          circles.push({
+            x: ox + Math.cos(a) * orbit,
+            y: oy + Math.sin(a) * orbit,
+            r: toothR * (
+              .82 + ((i % 3) * .09)
+            )
+          });
+        }
+
+        const g =
+          document.createElementNS(NS, "g");
+
+        circles.forEach(q => {
+          g.appendChild(
+            circleEl(q.x, q.y, q.r)
+          );
+        });
+
+        biteMask.appendChild(g);
+
+        const item = {
+          circles
+        };
+
+        bites.push(item);
+
+        return item;
+      }
+
+      function isRemoved(x, y) {
+        for (const bite of bites) {
+          for (const c of bite.circles) {
+            if (
+              (x - c.x) ** 2
+              + (y - c.y) ** 2
+              <= c.r * c.r
+            ) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+
+      /*
+        用采样网格估算还剩多少月饼。
+        对这种小游戏精度已经足够，而且计算量很小。
+      */
+      function eatenFraction() {
+        let all = 0;
+        let gone = 0;
+
+        for (let y = 48; y <= 352; y += 8) {
+          for (let x = 48; x <= 352; x += 8) {
+            if (
+              (x - CX) ** 2
+              + (y - CY) ** 2
+              <= R * R
+            ) {
+              all++;
+
+              if (isRemoved(x, y)) {
+                gone++;
+              }
+            }
+          }
+        }
+
+        return gone / all;
+      }
+
+      function updateProgress() {
+        const eaten = eatenFraction();
+
+        const left =
+          Math.max(
+            0,
+            Math.round((1 - eaten) * 100)
+          );
+
+        remaining.textContent =
+          `还剩 ${left}%`;
+
+        if (eaten >= .94 && !finished) {
+          finish();
+        }
+      }
+
+      function eventCoords(ev) {
+        const rect =
+          svg.getBoundingClientRect();
+
+        return {
+          x:
+            (ev.clientX - rect.left)
+            / rect.width
+            * 400,
+
+          y:
+            (ev.clientY - rect.top)
+            / rect.height
+            * 400,
+
+          clientX: ev.clientX,
+          clientY: ev.clientY
+        };
+      }
+
+      function crumbsAt(
+        clientX,
+        clientY,
+        sizeFactor
+      ) {
+        const rect =
+          stage.getBoundingClientRect();
+
+        const x =
+          clientX - rect.left;
+
+        const y =
+          clientY - rect.top;
+
+        const n =
+          Math.max(
+            8,
+            Math.min(
+              22,
+              Math.round(
+                9 + sizeFactor * 12
+              )
+            )
+          );
+
+        const colors = [
+          "#b96e2f",
+          "#d89945",
+          "#e8b95e",
+          "#8f4f22",
+          "#f0c878"
+        ];
+
+        for (let i = 0; i < n; i++) {
+          const p =
+            document.createElement("span");
+
+          p.className = "crumb";
+
+          const s =
+            3
+            + Math.random()
+            * 7
+            * (.7 + sizeFactor * .35);
+
+          p.style.width = `${s}px`;
+          p.style.height =
+            `${s * (.55 + Math.random() * .7)}px`;
+
+          p.style.left = `${x}px`;
+          p.style.top = `${y}px`;
+
+          p.style.background =
+            colors[
+              Math.floor(
+                Math.random() * colors.length
+              )
+            ];
+
+          p.style.setProperty(
+            "--dx",
+            `${-70 + Math.random() * 140}px`
+          );
+
+          p.style.setProperty(
+            "--dy",
+            `${55 + Math.random() * 120}px`
+          );
+
+          p.style.setProperty(
+            "--rot",
+            `${-220 + Math.random() * 440}deg`
+          );
+
+          p.style.setProperty(
+            "--dur",
+            `${560 + Math.random() * 430}ms`
+          );
+
+          particleLayer.appendChild(p);
+
+          setTimeout(
+            () => p.remove(),
+            1100
+          );
+        }
+      }
+
+      /*
+        不加载任何外部音频文件。
+        使用 Web Audio API 合成三段短噪声，
+        模拟“咔嚓 / 咔哧”的脆响。
+      */
+      function crunch() {
+        if (!soundOn) {
+          return;
+        }
+
+        try {
+          const AudioContextClass =
+            window.AudioContext
+            || window.webkitAudioContext;
+
+          if (!AudioContextClass) {
+            return;
+          }
+
+          if (!audioCtx) {
+            audioCtx =
+              new AudioContextClass();
+          }
+
+          if (
+            audioCtx.state === "suspended"
+          ) {
+            audioCtx.resume();
+          }
+
+          const now =
+            audioCtx.currentTime;
+
+          const parts = [
+            [0,     .07, 1250, .24],
+            [.055,  .09, 720,  .18],
+            [.13,   .055,1650, .12]
+          ];
+
+          parts.forEach(
+            ([offset, duration, frequency, volume]) => {
+              const len =
+                Math.max(
+                  1,
+                  Math.floor(
+                    audioCtx.sampleRate * duration
+                  )
+                );
+
+              const buffer =
+                audioCtx.createBuffer(
+                  1,
+                  len,
+                  audioCtx.sampleRate
+                );
+
+              const data =
+                buffer.getChannelData(0);
+
+              for (let i = 0; i < len; i++) {
+                const env =
+                  Math.pow(
+                    1 - i / len,
+                    2.3
+                  );
+
+                data[i] =
+                  (Math.random() * 2 - 1)
+                  * env;
+              }
+
+              const src =
+                audioCtx.createBufferSource();
+
+              const filter =
+                audioCtx.createBiquadFilter();
+
+              const gain =
+                audioCtx.createGain();
+
+              src.buffer = buffer;
+
+              filter.type = "bandpass";
+              filter.frequency.value =
+                frequency;
+
+              filter.Q.value = .85;
+
+              gain.gain.value =
+                volume;
+
+              src
+                .connect(filter)
+                .connect(gain)
+                .connect(audioCtx.destination);
+
+              src.start(
+                now + offset
+              );
+            }
+          );
+        } catch (_) {
+          // Audio 不可用时静默失败。
+        }
+      }
+
+      function haptic() {
+        if (
+          vibeOn
+          && typeof navigator.vibrate === "function"
+        ) {
+          try {
+            navigator.vibrate(
+              [18, 14, 25]
+            );
+          } catch (_) {
+            // 不支持震动时忽略。
+          }
+        }
+      }
+
+      function animateCake() {
+        svgWrap.classList.remove("chomp");
+
+        void svgWrap.offsetWidth;
+
+        svgWrap.classList.add("chomp");
+      }
+
+      function bite(ev) {
+        if (finished) {
+          return;
+        }
+
+        const p =
+          eventCoords(ev);
+
+        const inside =
+          (p.x - CX) ** 2
+          + (p.y - CY) ** 2
+          <= R * R;
+
+        if (
+          !inside
+          || isRemoved(p.x, p.y)
+        ) {
+          return;
+        }
+
+        const biteResult =
+          addBiteGeometry(
+            p.x,
+            p.y
+          );
+
+        if (!biteResult) {
+          return;
+        }
+
+        const main =
+          biteResult.circles[0];
+
+        crumbsAt(
+          p.clientX,
+          p.clientY,
+          Math.min(
+            1,
+            main.r / 80
+          )
+        );
+
+        crunch();
+        haptic();
+        animateCake();
+
+        if (main.r > 78) {
+          subhint.textContent =
+            "好大一口！！";
+        } else if (main.r > 38) {
+          subhint.textContent =
+            "咔哧！";
+        } else {
+          subhint.textContent =
+            "咔嚓。";
+        }
+
+        updateProgress();
+      }
+
+      function finish() {
+        finished = true;
+        remaining.textContent =
+          "吃完啦";
+
+        setTimeout(() => {
+          cakeScene.style.display = "none";
+          wishScene.classList.add("show");
+        }, 420);
+      }
+
+      function resetCake() {
+        bites = [];
+        biteMask.replaceChildren();
+
+        finished = false;
+
+        cakeScene.style.display =
+          "grid";
+
+        wishScene.classList.remove(
+          "show"
+        );
+
+        remaining.textContent =
+          "还剩 100%";
+
+        subhint.textContent =
+          "越往里面点，这一口越大。";
+      }
+
+      function start(
+        rawCake,
+        rawWish
+      ) {
+        const result =
+          validate(
+            rawCake,
+            rawWish
+          );
+
+        if (!result.ok) {
+          validation.textContent =
+            result.msg;
+
+          return;
+        }
+
+        validation.textContent = "";
+
+        renderStamp(
+          result.lines
+        );
+
+        wishText.textContent =
+          result.wish;
+
+        resetCake();
+
+        tutorial.hidden = true;
+        experience.hidden = false;
+      }
+
+      function showTutorial() {
+        experience.hidden = true;
+        tutorial.hidden = false;
+        validation.textContent = "";
+      }
+
+      function makeShareURL(
+        rawCake,
+        rawWish
+      ) {
+        const result =
+          validate(
+            rawCake,
+            rawWish
+          );
+
+        if (!result.ok) {
+          validation.textContent =
+            result.msg;
+
+          return null;
+        }
+
+        const url =
+          new URL(
+            window.location.href
+          );
+
+        url.search = "";
+
+        url.searchParams.set(
+          "cake",
+          rawCake
+        );
+
+        url.searchParams.set(
+          "wish",
+          rawWish
+        );
+
+        return url.toString();
+      }
+
+      previewBtn.addEventListener(
+        "click",
+        () => {
+          start(
+            cakeInput.value,
+            wishInput.value
+          );
+        }
+      );
+
+      linkBtn.addEventListener(
+        "click",
+        () => {
+          const url =
+            makeShareURL(
+              cakeInput.value,
+              wishInput.value
+            );
+
+          if (!url) {
+            return;
+          }
+
+          generatedLink.textContent =
+            url;
+        }
+      );
+
+      /*
+        pointerup 同时兼容鼠标和大多数触摸设备。
+      */
+      svg.addEventListener(
+        "pointerup",
+        ev => {
+          if (
+            ev.pointerType !== "mouse"
+            || ev.button === 0
+          ) {
+            bite(ev);
+          }
+        }
+      );
+
+      /*
+        键盘无障碍：
+        Enter / Space 会在月饼上方啃一口。
+      */
+      svgWrap.addEventListener(
+        "keydown",
+        ev => {
+          if (
+            ev.key === "Enter"
+            || ev.key === " "
+          ) {
+            ev.preventDefault();
+
+            const rect =
+              svg.getBoundingClientRect();
+
+            bite({
+              clientX:
+                rect.left
+                + rect.width * .5,
+
+              clientY:
+                rect.top
+                + rect.height * .27
+            });
+          }
+        }
+      );
+
+      againBtn.addEventListener(
+        "click",
+        resetCake
+      );
+
+      backBtn.addEventListener(
+        "click",
+        showTutorial
+      );
+
+      soundBtn.addEventListener(
+        "click",
+        () => {
+          soundOn =
+            !soundOn;
+
+          soundBtn.textContent =
+            soundOn
+              ? "🔊 声音"
+              : "🔇 静音";
+        }
+      );
+
+      vibeBtn.addEventListener(
+        "click",
+        () => {
+          vibeOn =
+            !vibeOn;
+
+          vibeBtn.textContent =
+            vibeOn
+              ? "📳 震动"
+              : "— 震动关";
+        }
+      );
+
+      const params =
+        new URLSearchParams(
+          location.search
+        );
+
+      const queryCake =
+        params.get("cake");
+
+      const queryWish =
+        params.get("wish");
+
+      const initial =
+        validate(
+          queryCake,
+          queryWish
+        );
+
+      if (initial.ok) {
+        start(
+          queryCake,
+          queryWish
+        );
+      } else {
+        showTutorial();
+      }
+    })();
+  </script>
+</body>
+</html>
