@@ -965,33 +965,135 @@
         const inwardAngle =
           Math.atan2(CY - oy, CX - ox);
 
-        const toothR =
-          Math.max(3.4, Math.min(10, rad * .12));
+        /*
+          Bigger bites need more visible tooth scallops.
+          The count grows with the bite radius instead of stopping at 11,
+          while radius / spacing / depth get small random variations so a
+          large bite does not turn into a smooth, machine-perfect semicircle.
+        */
+        const baseToothR =
+          Math.max(
+            4,
+            Math.min(
+              19,
+              rad * .19
+            )
+          );
 
         const count =
           Math.max(
             5,
             Math.min(
-              11,
-              Math.round(rad / 8)
+              18,
+              Math.round(
+                4 + rad / 9
+              )
             )
           );
 
+        const arcStart = -1.2;
+        const arcSpan = 2.4;
+
         for (let i = 0; i < count; i++) {
+          const t =
+            count === 1
+              ? .5
+              : i / (count - 1);
+
+          /*
+            Keep the two end teeth close to the bite corners,
+            but jitter the inner teeth enough to avoid a regular comb.
+          */
+          const angleJitter =
+            (i === 0 || i === count - 1)
+              ? 0
+              : (Math.random() - .5)
+                * Math.min(.13, .7 / count);
+
           const a =
             inwardAngle
-            - 1.16
-            + (2.32 * i / Math.max(1, count - 1));
+            + arcStart
+            + arcSpan * t
+            + angleJitter;
 
-          const orbit = rad * .91;
+          /*
+            A slightly larger orbit makes each little tooth circle
+            protrude beyond the smooth main bite circle.
+            Random depth makes neighboring tooth marks uneven.
+          */
+          const orbit =
+            rad * (
+              .92
+              + (Math.random() - .5) * .075
+            );
+
+          const toothR =
+            baseToothR * (
+              .72
+              + Math.random() * .52
+            );
 
           circles.push({
-            x: ox + Math.cos(a) * orbit,
-            y: oy + Math.sin(a) * orbit,
-            r: toothR * (
-              .82 + ((i % 3) * .09)
-            )
+            x:
+              ox
+              + Math.cos(a) * orbit,
+            y:
+              oy
+              + Math.sin(a) * orbit,
+            r: toothR
           });
+        }
+
+        /*
+          On very large bites add a few smaller secondary notches.
+          They break up any remaining long smooth arc without making the
+          whole edge look like a perfectly repeated sawtooth pattern.
+        */
+        if (rad > 58) {
+          const secondaryCount =
+            Math.min(
+              7,
+              Math.max(
+                2,
+                Math.round(
+                  (rad - 45) / 18
+                )
+              )
+            );
+
+          for (let i = 0; i < secondaryCount; i++) {
+            const t =
+              (i + .5)
+              / secondaryCount;
+
+            const a =
+              inwardAngle
+              + arcStart
+              + arcSpan * t
+              + (Math.random() - .5) * .09;
+
+            const orbit =
+              rad * (
+                .955
+                + Math.random() * .04
+              );
+
+            const toothR =
+              baseToothR * (
+                .42
+                + Math.random() * .28
+              );
+
+            circles.push({
+              x:
+                ox
+                + Math.cos(a) * orbit,
+              y:
+                oy
+                + Math.sin(a) * orbit,
+              r: toothR
+            });
+          }
         }
 
         const g =
