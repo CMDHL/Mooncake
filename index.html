@@ -95,11 +95,39 @@
 
     .example {
       margin-top: 16px;
-      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      padding: 10px 10px 10px 14px;
       border-radius: 14px;
       border: 1px solid var(--border);
       background: var(--card);
       line-height: 1.5;
+    }
+
+    .example-scroll {
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 2px;
+    }
+
+    .example-scroll code {
+      white-space: nowrap;
+      overflow-wrap: normal;
+    }
+
+    .copy-button {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 6px 12px;
+      font-size: .86em;
+      background: #fff;
     }
 
     .fields {
@@ -411,7 +439,16 @@
       </p>
 
       <div class="example">
-        <code>?cake=中秋[br]快乐&amp;wish=祝你中秋快乐！[br]每天都开心🥮</code>
+        <div class="example-scroll" aria-label="当前分享链接">
+          <code id="exampleLink">?cake=中秋[br]快乐&amp;wish=祝你中秋快乐！[br]每天都开心🥮</code>
+        </div>
+        <button
+          id="copyLinkBtn"
+          type="button"
+          class="copy-button"
+        >
+          复制
+        </button>
       </div>
 
       <div class="fields">
@@ -452,11 +489,9 @@
           id="linkBtn"
           type="button"
         >
-          生成当前链接
+          更新分享链接
         </button>
       </div>
-
-      <p id="generatedLink" class="tiny"></p>
 
       <p class="tiny">
         如果缺少任意参数、参数为空、月饼文字格式不对，
@@ -767,7 +802,8 @@
       const validation = document.querySelector("#validation");
       const previewBtn = document.querySelector("#previewBtn");
       const linkBtn = document.querySelector("#linkBtn");
-      const generatedLink = document.querySelector("#generatedLink");
+      const exampleLink = document.querySelector("#exampleLink");
+      const copyLinkBtn = document.querySelector("#copyLinkBtn");
 
       const svg = document.querySelector("#cakeSvg");
       const svgWrap = document.querySelector("#svgWrap");
@@ -1602,9 +1638,72 @@
             return;
           }
 
-          generatedLink.textContent =
-            url;
+          exampleLink.textContent = url;
+
+          const scroller =
+            exampleLink.closest(".example-scroll");
+
+          if (scroller) {
+            scroller.scrollLeft = 0;
+          }
+
+          copyLinkBtn.textContent = "复制";
         }
+      );
+
+      async function copyCurrentLink() {
+        const text =
+          exampleLink.textContent.trim();
+
+        if (!text) {
+          return;
+        }
+
+        try {
+          if (
+            navigator.clipboard
+            && window.isSecureContext
+          ) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const textarea =
+              document.createElement("textarea");
+
+            textarea.value = text;
+            textarea.setAttribute("readonly", "");
+            textarea.style.position = "absolute";
+            textarea.style.left = "-9999px";
+
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            document.execCommand("copy");
+            textarea.remove();
+          }
+
+          copyLinkBtn.textContent = "已复制 ✓";
+
+          setTimeout(
+            () => {
+              copyLinkBtn.textContent = "复制";
+            },
+            1500
+          );
+        } catch (_) {
+          copyLinkBtn.textContent = "复制失败";
+
+          setTimeout(
+            () => {
+              copyLinkBtn.textContent = "复制";
+            },
+            1500
+          );
+        }
+      }
+
+      copyLinkBtn.addEventListener(
+        "click",
+        copyCurrentLink
       );
 
       /*
