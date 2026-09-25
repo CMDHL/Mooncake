@@ -407,11 +407,11 @@
         这个页面需要两个 URL 参数：
         <code>cake</code> 是印在月饼上的字，
         <code>wish</code> 是吃完后的祝福。
-        月饼文字里用 <code>[br]</code> 手动换行。
+        月饼文字和祝福文字里都可以用 <code>[br]</code> 手动换行。
       </p>
 
       <div class="example">
-        <code>?cake=中秋[br]快乐&amp;wish=祝你每天都开心🥮</code>
+        <code>?cake=中秋[br]快乐&amp;wish=祝你中秋快乐！[br]每天都开心🥮</code>
       </div>
 
       <div class="fields">
@@ -429,8 +429,7 @@
           <textarea
             id="wishInput"
             aria-label="吃完后的祝福"
-          >中秋快乐！🥮
-愿接下来的日子也甜甜的。</textarea>
+          >中秋快乐！🥮[br]愿接下来的日子也甜甜的。</textarea>
         </label>
       </div>
 
@@ -462,6 +461,7 @@
       <p class="tiny">
         如果缺少任意参数、参数为空、月饼文字格式不对，
         或祝福文字明显过长，就会显示这个教程页面。
+        <code>cake</code> 和 <code>wish</code> 都可以用 <code>[br]</code> 换行。
       </p>
     </section>
 
@@ -805,12 +805,19 @@
           .map(part => part.trim());
       }
 
+      function parseWish(raw) {
+        return String(raw ?? "")
+          .replace(/\[br\]/gi, "\n")
+          .trim();
+      }
+
       function validate(rawCake, rawWish) {
         const rawCakeString = String(rawCake ?? "");
-        const wish = String(rawWish ?? "").trim();
+        const rawWishString = String(rawWish ?? "");
+        const wish = parseWish(rawWishString);
         const lines = parseCake(rawCakeString);
 
-        if (!rawCakeString.trim() || !wish) {
+        if (!rawCakeString.trim() || !rawWishString.trim() || !wish) {
           return {
             ok: false,
             msg: "需要同时提供 cake 和 wish 两个参数。"
